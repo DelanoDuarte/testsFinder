@@ -53,4 +53,4 @@ docker-compose up
 
 #### Testing on Browser
 
-http://localhost/
+http://localhost:3000
