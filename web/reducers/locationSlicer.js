@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   current: {},
   address: {},
+  draggable: false,
 };
 
 export const locationSlice = createSlice({
@@ -15,8 +16,19 @@ export const locationSlice = createSlice({
     setCurrentAddress: (state, action) => {
       state.address = action.payload;
     },
+    setMarkerAsDraggable: (state) => {
+      state.draggable = true;
+    },
+    setMarkerAsFixed: (state) => {
+      state.draggable = true;
+    },
   },
 });
 
-export const { setCurrentLocation, setCurrentAddress } = locationSlice.actions;
+export const {
+  setCurrentLocation,
+  setCurrentAddress,
+  setMarkerAsDraggable,
+  setMarkerAsFixed,
+} = locationSlice.actions;
 export default locationSlice.reducer;

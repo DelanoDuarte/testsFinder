@@ -2,7 +2,7 @@ import { Biotech, QueryBuilder } from "@mui/icons-material";
 import { Card, CardContent, Divider, Grid, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 
-const PlaceCard = ({ pharmacy }) => {
+const PlaceCard = ({ place }) => {
   return (
     <Card
       sx={{
@@ -28,7 +28,7 @@ const PlaceCard = ({ pharmacy }) => {
           gutterBottom
           variant="h5"
         >
-          {pharmacy.pharmacyName}
+          {place.name}
         </Typography>
         {/* <Typography align="center" color="textPrimary" variant="body1">
           {product.description}
@@ -69,7 +69,7 @@ const PlaceCard = ({ pharmacy }) => {
               sx={{ pl: 1 }}
               variant="body2"
             >
-              {pharmacy.amountTests} Available Tests
+              100 Available Tests
             </Typography>
           </Grid>
         </Grid>

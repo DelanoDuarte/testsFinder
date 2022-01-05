@@ -8,6 +8,8 @@ import {
   Grid,
   TextField,
 } from "@mui/material";
+import LoadingButton from "@mui/lab/LoadingButton";
+
 import { Form, FormikProvider } from "formik";
 import { PlaceFormMap, PlaceFormAddress } from ".";
 
@@ -17,7 +19,7 @@ const PlaceForm = ({ formik }) => {
 
   return (
     <FormikProvider value={formik}>
-      <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
         <Grid container spacing={3}>
           <Grid item lg={8} md={6} xs={12}>
             <Card sx={{ padding: 2 }} elevation={3}>
@@ -70,6 +72,19 @@ const PlaceForm = ({ formik }) => {
                       variant="outlined"
                     />
                   </Grid>
+                  <Grid item md={6} xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Amount of Covid Tests"
+                      name="amount_tests"
+                      {...getFieldProps("amount_tests")}
+                      error={Boolean(
+                        touched.amount_tests && errors.amount_tests
+                      )}
+                      helperText={touched.amount_tests && errors.amount_tests}
+                      variant="outlined"
+                    />
+                  </Grid>
                   <Grid item md={12} xs={12}>
                     <PlaceFormAddress />
                   </Grid>
@@ -83,9 +98,15 @@ const PlaceForm = ({ formik }) => {
                   p: 2,
                 }}
               >
-                <Button type="submit" color="primary" variant="contained">
+                <LoadingButton
+                  type="submit"
+                  color="primary"
+                  loading={isSubmitting}
+                  loadingIndicator="Saving..."
+                  variant="contained"
+                >
                   Save
-                </Button>
+                </LoadingButton>
               </Box>
             </Card>
           </Grid>
@@ -95,7 +116,7 @@ const PlaceForm = ({ formik }) => {
             </Card>
           </Grid>
         </Grid>
-      </Form>
+      </form>
     </FormikProvider>
   );
 };

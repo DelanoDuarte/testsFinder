@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   MapContainer,
   Marker,
@@ -14,9 +14,10 @@ const position = [51.505, -0.09];
 
 const CurrentLocationMarker = ({}) => {
   const [position, setPosition] = useState(null);
-  const [draggable, setDraggable] = useState(false);
+  const markerRef = useRef(null);
 
   const latLng = useSelector((state) => state.location.current);
+  const draggable = useSelector((state) => state.location.draggable);
 
   const dispatch = useDispatch();
 
@@ -35,10 +36,24 @@ const CurrentLocationMarker = ({}) => {
       dispatch(setCurrentLocation(e.latlng));
       map.flyTo(e.latlng, 12);
     },
+    dragend() {
+      const marker = markerRef.current;
+      if (marker != null) {
+        if (marker.getLatLng() != latLng) {
+          setPosition(marker.getLatLng());
+          dispatch(setCurrentLocation(marker.getLatLng()));
+        }
+      }
+    },
   });
 
   return position === null ? null : (
-    <Marker position={position} icon={positionMarker}>
+    <Marker
+      draggable={draggable}
+      position={position}
+      icon={positionMarker}
+      ref={markerRef}
+    >
       <Popup>Your Position</Popup>
     </Marker>
   );
@@ -54,7 +69,7 @@ const PlaceFormMap = ({}) => {
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        maxZoom={16}
+        maxZoom={20}
       />
 
       <CurrentLocationMarker />

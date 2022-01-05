@@ -1,13 +1,28 @@
-import { Box, Container, Grid, Pagination, Typography } from "@mui/material";
+import { Box, Container, Grid, Pagination } from "@mui/material";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import { PlaceCard } from "../../../components/place";
 import PlaceListToolbar from "../../../components/place/PlaceListToolbar";
 import { Page } from "../../../components/shared";
-import { PHARMACIES } from "../../../mocks/pharmacy";
-
-import { useRouter } from "next/router";
+import PlaceAPI from "../../../lib/api/PlaceAPI";
 
 const PlaceIndex = (props) => {
   const router = useRouter();
+
+  const [places, setPlaces] = useState([]);
+
+  const onPageChange = (event, value) => {
+    searchPlaces(10, value - 1);
+  };
+
+  const searchPlaces = (limit, offset) => {
+    PlaceAPI.page(limit, offset).then((res) => {
+      setPlaces(res.data.results);
+    });
+  };
+  useEffect(() => {
+    searchPlaces(10, 0);
+  }, []);
 
   return (
     <Page title="Places">
@@ -16,9 +31,9 @@ const PlaceIndex = (props) => {
 
         <Box sx={{ pt: 3 }}>
           <Grid container spacing={3}>
-            {PHARMACIES.map((pharmacy) => (
-              <Grid item key={pharmacy.id} lg={4} md={6} xs={12}>
-                <PlaceCard pharmacy={pharmacy} />
+            {places.map((place) => (
+              <Grid item key={place.id} lg={4} md={6} xs={12}>
+                <PlaceCard place={place} />
               </Grid>
             ))}
           </Grid>
@@ -30,7 +45,7 @@ const PlaceIndex = (props) => {
             pt: 3,
           }}
         >
-          <Pagination color="primary" count={3} size="small" />
+          <Pagination color="primary" size="small" onChange={onPageChange} />
         </Box>
       </Container>
     </Page>

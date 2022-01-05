@@ -1,16 +1,17 @@
-from django.http.response import JsonResponse
 from django.shortcuts import render
 
+from rest_framework.generics import ListAPIView
 from rest_framework.parsers import JSONParser
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.pagination import LimitOffsetPagination
 
-from place.serializers import CreatePlaceSerializer, PlaceListSerializer
-from .models import Place
+from place.serializers import CreatePlaceSerializer, PlaceAddressGeolocationSerializer, PlaceAddressListSerializer, PlaceListSerializer
+from .models import Place, PlaceAddress
 
 # Create your views here.
-class PlaceList(APIView):
+class PlaceList(APIView):    
     def get(self, request: Request):
         stores = Place.objects.all()
         serializer = PlaceListSerializer(stores, many=True)
@@ -23,3 +24,19 @@ class PlaceList(APIView):
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
+
+class PlacePaginatedList(ListAPIView):
+    queryset = Place.objects.all()
+    serializer_class = PlaceListSerializer
+    pagination_class = LimitOffsetPagination
+
+class PlacesNearbyList(APIView):
+
+    def post(self, request: Request):
+        data = JSONParser().parse(request)
+        locationSerializer = PlaceAddressGeolocationSerializer(data=data)
+        if locationSerializer.is_valid():
+            places = Place.find_nearby_places(**locationSerializer.data)
+            serializer = PlaceListSerializer(places, many=True)
+            return Response(serializer.data)
+        return Response(locationSerializer.errors, status=400)

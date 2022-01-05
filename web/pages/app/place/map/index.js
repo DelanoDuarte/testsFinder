@@ -18,19 +18,25 @@ import {
   placeMarker,
   positionMarker,
 } from "../../../../components/map/AppIconMarker";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setCurrentLocation } from "../../../../reducers/locationSlicer";
+import PlaceAPI from "../../../../lib/api/PlaceAPI";
 
 const position = [51.505, -0.09];
 
-const MyLocationMarker = () => {
+const MyLocationMarker = ({}) => {
   const [position, setPosition] = useState(null);
+  const dispatch = useDispatch();
+
   const map = useMapEvents({
     click() {
       map.locate();
     },
     locationfound(e) {
       setPosition(e.latlng);
-      map.flyTo(e.latlng, 14);
+      dispatch(setCurrentLocation(e.latlng));
+      map.flyTo(e.latlng, 16);
     },
   });
 
@@ -42,18 +48,18 @@ const MyLocationMarker = () => {
 };
 
 const PlaceMarker = ({ place }) => {
-  const position = new LatLng(place.latitude, place.longitude);
+  const position = new LatLng(place.address.latitude, place.address.longitude);
   return (
     <Marker position={position} icon={placeMarker}>
       <Popup permanent>
         <div>
-          <b> {place.amountTests} </b> Covid Tests Available
+          <b> {place.amount_tests} </b> Covid Tests Available
         </div>
       </Popup>
 
       <Tooltip direction="bottom" offset={[0, 20]} opacity={1} permanent>
         <div>
-          <b> {place.amountTests} </b> Covid Tests Available
+          <b> {place.amount_tests} </b> Covid Tests Available
         </div>
       </Tooltip>
     </Marker>
@@ -61,6 +67,23 @@ const PlaceMarker = ({ place }) => {
 };
 
 const PharmaciesMap = () => {
+  const [places, setPlaces] = useState([]);
+
+  const latLng = useSelector((state) => state.location.current);
+
+  useEffect(() => {
+    if (latLng) {
+      const { lat, lng } = { ...latLng };
+      setTimeout(() => {
+        PlaceAPI.nearby(lat, lng)
+          .then((res) => {
+            setPlaces(res.data);
+          })
+          .catch((error) => console.log(error));
+      }, 2000);
+    }
+  }, [latLng]);
+
   return (
     <Page title="Find">
       <Container maxWidth="lg">
@@ -76,8 +99,8 @@ const PharmaciesMap = () => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             maxZoom={20}
           />
-          {FIRST_FIVE_PHARMACIES.map((p) => (
-            <PlaceMarker key={p.id} place={p} />
+          {places.map((place) => (
+            <PlaceMarker key={place.id} place={place} />
           ))}
 
           <MyLocationMarker />

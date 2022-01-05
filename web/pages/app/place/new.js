@@ -5,9 +5,14 @@ import { Page } from "../../../components/shared";
 import * as Yup from "yup";
 import { useRouter } from "next/router";
 import { PlaceForm } from "../../../components/place";
+import { useSelector } from "react-redux";
+import PlaceAPI from "../../../lib/api/PlaceAPI";
 
 const NewPlace = (props) => {
   const navigate = useRouter();
+
+  const locationAddress = useSelector((state) => state.location.address);
+  const latLng = useSelector((state) => state.location.current);
 
   const PlaceSchema = Yup.object().shape({
     name: Yup.string().required("Name is required"),
@@ -17,27 +22,48 @@ const NewPlace = (props) => {
     description: Yup.string(),
     phone: Yup.string().required("Phone is required"),
     website: Yup.string(),
-    address: Yup.object().shape({
-      latitude: Yup.number().required(),
-      longitude: Yup.number().required(),
-    }),
+    amount_tests: Yup.number().required("Amount of tests is required")
   });
 
   const formik = useFormik({
     initialValues: {
       name: "",
       email: "",
-      description: "",
+      description: undefined,
       phone: "",
-      website: "",
+      website: undefined,
+      amount_tests: undefined,
       address: {
-        latitude: "",
-        longitude: "",
+        mainStreet: "",
+        additionalStreet: "",
+        streetNumber: "",
+        zip: "",
+        city: "",
+        country: "",
       },
     },
     validationSchema: PlaceSchema,
-    onSubmit: () => {
-      navigate.push("/", {});
+    onSubmit: ({ name, email, description, phone, website, amount_tests }) => {
+      console.log(locationAddress);
+
+      const { lat, lng } = { ...latLng };
+      const address = { lat, lng, ...locationAddress };
+
+      PlaceAPI.create({
+        name,
+        email,
+        description,
+        phone,
+        website,
+        amount_tests,
+        address,
+      })
+        .then((res) => {
+          if (res.status == 201) {
+            navigate.push("/app/place");
+          }
+        })
+        .catch((error) => console.log(error));
     },
   });
 

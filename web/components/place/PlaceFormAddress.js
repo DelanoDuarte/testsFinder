@@ -1,4 +1,4 @@
-import { Edit } from "@mui/icons-material";
+import { Edit, Map } from "@mui/icons-material";
 import {
   Card,
   CardContent,
@@ -13,7 +13,10 @@ import { Box } from "@mui/system";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import LocationAPI from "../../lib/api/LocationAPI";
-import { setCurrentAddress } from "../../reducers/locationSlicer";
+import {
+  setCurrentAddress,
+  setMarkerAsDraggable,
+} from "../../reducers/locationSlicer";
 
 const PlaceFormAddress = ({}) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -51,13 +54,22 @@ const PlaceFormAddress = ({}) => {
         >
           <CardHeader subheader="Location" title="Place" sx={{ py: 2 }} />
 
-          <IconButton
-            color="primary"
-            aria-label="Edit"
-            onClick={() => setDisabled(false)}
-          >
-            <Edit />
-          </IconButton>
+          <Box>
+            <IconButton
+              color="primary"
+              aria-label="Edit"
+              onClick={() => setDisabled(false)}
+            >
+              <Edit />
+            </IconButton>
+            <IconButton
+              color="primary"
+              aria-label="Edit"
+              onClick={() => dispatch(setMarkerAsDraggable())}
+            >
+              <Map />
+            </IconButton>
+          </Box>
         </Box>
         <Divider />
         <CardContent>
