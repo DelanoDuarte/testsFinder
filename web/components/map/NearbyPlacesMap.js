@@ -1,68 +1,64 @@
-import { useRef, useState } from "react";
+import { LatLng } from "leaflet";
 import "leaflet-defaulticon-compatibility";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 import "leaflet/dist/leaflet.css";
+import { useState } from "react";
 import {
   MapContainer,
   Marker,
   Popup,
   TileLayer,
+  Tooltip,
   useMapEvents,
 } from "react-leaflet";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setCurrentLocation } from "../../reducers/locationSlicer";
-import { positionMarker } from "../map/AppIconMarker";
+import { placeMarker, positionMarker } from "./AppIconMarker";
 
 const position = [51.505, -0.09];
 
-const CurrentLocationMarker = ({}) => {
+const MyLocationMarker = ({}) => {
   const [position, setPosition] = useState(null);
-  const markerRef = useRef(null);
-
-  const latLng = useSelector((state) => state.location.current);
-  const draggable = useSelector((state) => state.location.draggable);
-
   const dispatch = useDispatch();
 
   const map = useMapEvents({
-    load() {
-      if (latLng && latLng.lat && latLng.lng) {
-        setPosition(latLng);
-        map.flyTo(latLng, 12);
-      }
-    },
     click() {
       map.locate();
     },
     locationfound(e) {
       setPosition(e.latlng);
       dispatch(setCurrentLocation(e.latlng));
-      map.flyTo(e.latlng, 12);
-    },
-    dragend() {
-      const marker = markerRef.current;
-      if (marker != null) {
-        if (marker.getLatLng() != latLng) {
-          setPosition(marker.getLatLng());
-          dispatch(setCurrentLocation(marker.getLatLng()));
-        }
-      }
+      map.flyTo(e.latlng, 16);
     },
   });
 
   return position === null ? null : (
-    <Marker
-      draggable={draggable}
-      position={position}
-      icon={positionMarker}
-      ref={markerRef}
-    >
-      <Popup>Your Position</Popup>
+    <Marker position={position} icon={positionMarker}>
+      <Popup>You are here</Popup>
     </Marker>
   );
 };
 
-const PlaceFormMap = ({}) => {
+const PlaceMarker = ({ place }) => {
+  const position = new LatLng(place.address.latitude, place.address.longitude);
+  return (
+    <Marker position={position} icon={placeMarker}>
+      <Popup permanent>
+        <div>
+          <b> {place.name} </b>
+        </div>
+      </Popup>
+
+      <Tooltip direction="bottom" offset={[0, 20]} opacity={1} permanent>
+        <div>
+          <b> {place.amount_tests} </b> Covid Tests Available
+        </div>
+      </Tooltip>
+    </Marker>
+  );
+};
+
+const NearbyPlacesMap = ({ places }) => {
   return (
     <MapContainer
       center={position}
@@ -74,10 +70,13 @@ const PlaceFormMap = ({}) => {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         maxZoom={20}
       />
+      {places.map((place) => (
+        <PlaceMarker key={place.id} place={place} />
+      ))}
 
-      <CurrentLocationMarker />
+      <MyLocationMarker />
     </MapContainer>
   );
 };
 
-export default PlaceFormMap;
+export default NearbyPlacesMap;

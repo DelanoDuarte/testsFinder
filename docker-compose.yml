@@ -1,0 +1,28 @@
+version: '3.6'
+
+services:
+  tests-finder:
+    build:
+      context: .
+      dockerfile: deployment/Dockerfile
+    command: scripts/start.sh
+    environment:
+      POSTGRES_NAME: postgres
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_HOST: db
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+
+  tests-finder-web:
+    build:
+      context: .
+      dockerfile: deployment/DockerfileWeb
+    volumes:
+      - .:/app
+    working_dir: /app/web
+    restart: on-failure
+    ports:
+      - "3000:3000"

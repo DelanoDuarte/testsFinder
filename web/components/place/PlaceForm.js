@@ -1,6 +1,6 @@
+import LoadingButton from "@mui/lab/LoadingButton";
 import {
   Box,
-  Button,
   Card,
   CardContent,
   CardHeader,
@@ -8,10 +8,11 @@ import {
   Grid,
   TextField,
 } from "@mui/material";
-import LoadingButton from "@mui/lab/LoadingButton";
+import { FormikProvider } from "formik";
+import dynamic from "next/dynamic";
+import { PlaceFormAddress } from ".";
 
-import { Form, FormikProvider } from "formik";
-import { PlaceFormMap, PlaceFormAddress } from ".";
+const PlaceFormMap = dynamic(() => import("./PlaceFormMap"), { ssr: false });
 
 const PlaceForm = ({ formik }) => {
   const { errors, touched, values, isSubmitting, handleSubmit, getFieldProps } =

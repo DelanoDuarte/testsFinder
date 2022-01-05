@@ -1,0 +1,6 @@
+*.sqlite3
+.git
+.gitignore
+
+/node_modules
+dist
