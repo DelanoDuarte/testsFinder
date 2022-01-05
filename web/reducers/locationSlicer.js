@@ -20,7 +20,7 @@ export const locationSlice = createSlice({
       state.draggable = true;
     },
     setMarkerAsFixed: (state) => {
-      state.draggable = true;
+      state.draggable = false;
     },
   },
 });

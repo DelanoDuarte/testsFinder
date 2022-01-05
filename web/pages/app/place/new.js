@@ -8,8 +8,11 @@ import { PlaceForm } from "../../../components/place";
 import { useSelector } from "react-redux";
 import PlaceAPI from "../../../lib/api/PlaceAPI";
 
+import { useSnackbar } from "notistack";
+
 const NewPlace = (props) => {
   const navigate = useRouter();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   const locationAddress = useSelector((state) => state.location.address);
   const latLng = useSelector((state) => state.location.current);
@@ -22,7 +25,7 @@ const NewPlace = (props) => {
     description: Yup.string(),
     phone: Yup.string().required("Phone is required"),
     website: Yup.string(),
-    amount_tests: Yup.number().required("Amount of tests is required")
+    amount_tests: Yup.number().required("Amount of tests is required"),
   });
 
   const formik = useFormik({
@@ -60,6 +63,7 @@ const NewPlace = (props) => {
       })
         .then((res) => {
           if (res.status == 201) {
+            enqueueSnackbar("New Place created", { variant: "success" });
             navigate.push("/app/place");
           }
         })

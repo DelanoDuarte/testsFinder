@@ -1,4 +1,4 @@
-import { Edit, Map } from "@mui/icons-material";
+import { Close, Edit, Map } from "@mui/icons-material";
 import {
   Card,
   CardContent,
@@ -8,6 +8,7 @@ import {
   IconButton,
   Skeleton,
   TextField,
+  Tooltip,
 } from "@mui/material";
 import { Box } from "@mui/system";
 import { useEffect, useState } from "react";
@@ -16,7 +17,9 @@ import LocationAPI from "../../lib/api/LocationAPI";
 import {
   setCurrentAddress,
   setMarkerAsDraggable,
+  setMarkerAsFixed,
 } from "../../reducers/locationSlicer";
+import { useSnackbar } from "notistack";
 
 const PlaceFormAddress = ({}) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -24,8 +27,24 @@ const PlaceFormAddress = ({}) => {
 
   const latLng = useSelector((state) => state.location.current);
   const address = useSelector((state) => state.location.address);
+  const isDraggable = useSelector((state) => state.location.draggable);
 
   const dispatch = useDispatch();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+
+  const setMarkerFixed = () => {
+    dispatch(setMarkerAsFixed());
+    enqueueSnackbar("The map marker is now anchored.", {
+      variant: "info",
+    });
+  };
+
+  const setMarkerDraggable = () => {
+    dispatch(setMarkerAsDraggable());
+    enqueueSnackbar("Now you can select your location using the map.", {
+      variant: "info",
+    });
+  };
 
   useEffect(() => {
     if (latLng && latLng.lat && latLng.lng) {
@@ -62,13 +81,28 @@ const PlaceFormAddress = ({}) => {
             >
               <Edit />
             </IconButton>
-            <IconButton
-              color="primary"
-              aria-label="Edit"
-              onClick={() => dispatch(setMarkerAsDraggable())}
-            >
-              <Map />
-            </IconButton>
+
+            {isDraggable ? (
+              <Tooltip title="Make the Marker Fixed">
+                <IconButton
+                  color="error"
+                  aria-label="Edit"
+                  onClick={setMarkerFixed}
+                >
+                  <Close />
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <Tooltip title="Select the Location on the Map">
+                <IconButton
+                  color="primary"
+                  aria-label="Edit"
+                  onClick={setMarkerDraggable}
+                >
+                  <Map />
+                </IconButton>
+              </Tooltip>
+            )}
           </Box>
         </Box>
         <Divider />

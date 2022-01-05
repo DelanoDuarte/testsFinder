@@ -69,7 +69,7 @@ const PlaceCard = ({ place }) => {
               sx={{ pl: 1 }}
               variant="body2"
             >
-              100 Available Tests
+              {place.amount_tests}
             </Typography>
           </Grid>
         </Grid>
