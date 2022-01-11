@@ -4,7 +4,7 @@ import { Page } from "../../../components/shared";
 
 import * as Yup from "yup";
 import { useRouter } from "next/router";
-import { PlaceForm } from "../../../components/place";
+import { PlaceForm, PlaceNewToolbar } from "../../../components/place";
 import { useSelector } from "react-redux";
 import PlaceAPI from "../../../lib/api/PlaceAPI";
 
@@ -74,6 +74,7 @@ const NewPlace = (props) => {
   return (
     <Page title="New Place">
       <Container maxWidth="lg">
+        <PlaceNewToolbar title="New Place" onBack={() => navigate.back()} />
         <PlaceForm formik={formik} />
       </Container>
     </Page>

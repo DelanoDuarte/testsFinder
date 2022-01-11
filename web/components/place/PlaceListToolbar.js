@@ -24,10 +24,14 @@ const PlaceListToolbar = ({ onAddPlace }) => (
         Places
       </Typography>
       <Box sx={{ m: 1 }}>
-        <Button startIcon={<Upload fontSize="small" />} sx={{ mr: 1 }}>
+        <Button disabled startIcon={<Upload fontSize="small" />} sx={{ mr: 1 }}>
           Import
         </Button>
-        <Button startIcon={<Download fontSize="small" />} sx={{ mr: 1 }}>
+        <Button
+          disabled
+          startIcon={<Download fontSize="small" />}
+          sx={{ mr: 1 }}
+        >
           Export
         </Button>
         <Button color="primary" variant="contained" onClick={onAddPlace}>

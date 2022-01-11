@@ -25,13 +25,15 @@ class Place(models.Model):
     website = models.CharField(max_length=512, null=True)
     active = models.BooleanField(default=True)
 
+    last_update = models.DateTimeField(auto_now=True)
+
     amount_tests = models.IntegerField(null=False)
 
     # Relationships
     address = models.ForeignKey(PlaceAddress, null=True, on_delete=models.CASCADE)
 
     @classmethod
-    def find_nearby_places(cls, latitude, longitude, radius=5000, limit=50):
+    def find_nearby_places(cls, latitude, longitude, radius=2000, limit=50):
 
         radius = float(radius) / 1000.0
 

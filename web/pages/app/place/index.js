@@ -10,18 +10,25 @@ const PlaceIndex = (props) => {
   const router = useRouter();
 
   const [places, setPlaces] = useState([]);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [itemsPerPage, setTotalItemsPerPage] = useState(10);
 
   const onPageChange = (event, value) => {
-    searchPlaces(10, value - 1);
+    if (value === 1) {
+      searchPlaces(itemsPerPage, 0);
+      return;
+    }
+    searchPlaces(itemsPerPage, itemsPerPage + (value + 1));
   };
 
   const searchPlaces = (limit, offset) => {
     PlaceAPI.page(limit, offset).then((res) => {
       setPlaces(res.data.results);
+      setTotalRecords(res.data.count);
     });
   };
   useEffect(() => {
-    searchPlaces(10, 0);
+    searchPlaces(itemsPerPage, 0);
   }, []);
 
   return (
@@ -45,7 +52,12 @@ const PlaceIndex = (props) => {
             pt: 3,
           }}
         >
-          <Pagination color="primary" size="small" onChange={onPageChange} />
+          <Pagination
+            count={Math.ceil(totalRecords / itemsPerPage)}
+            color="primary"
+            size="small"
+            onChange={onPageChange}
+          />
         </Box>
       </Container>
     </Page>

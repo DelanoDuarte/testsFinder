@@ -9,7 +9,7 @@ import {
   Popup,
   TileLayer,
   Tooltip,
-  useMapEvents,
+  useMapEvents
 } from "react-leaflet";
 import { useDispatch } from "react-redux";
 import { setCurrentLocation } from "../../reducers/locationSlicer";
@@ -50,9 +50,9 @@ const PlaceMarker = ({ place }) => {
       </Popup>
 
       <Tooltip direction="bottom" offset={[0, 20]} opacity={1} permanent>
-        <div>
+        <>
           <b> {place.amount_tests} </b> Covid Tests Available
-        </div>
+        </>
       </Tooltip>
     </Marker>
   );

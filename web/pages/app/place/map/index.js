@@ -5,6 +5,8 @@ import { useSelector } from "react-redux";
 import { Page } from "../../../../components/shared";
 import PlaceAPI from "../../../../lib/api/PlaceAPI";
 
+import { useSnackbar } from "notistack";
+
 const NearbyPlacesMap = dynamic(
   () => import("../../../../components/map/NearbyPlacesMap"),
   {
@@ -15,9 +17,35 @@ const NearbyPlacesMap = dynamic(
 const PlacesMap = () => {
   const [places, setPlaces] = useState([]);
 
+  const { enqueueSnackbar } = useSnackbar();
+
   const latLng = useSelector((state) => state.location.current);
 
+  const checkNavigationPermission = () => {
+    window.navigator.geolocation.getCurrentPosition(
+      (position) => {
+        console.log("Position: ", position);
+      },
+      (error) => {
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            enqueueSnackbar("You must activate the Geolocation.", {
+              variant: "warning",
+            });
+            break;
+          case error.POSITION_UNAVAILABLE:
+            enqueueSnackbar("Location information is unavailable.", {
+              variant: "warning",
+            });
+            break;
+        }
+      }
+    );
+  };
+
   useEffect(() => {
+    checkNavigationPermission();
+
     if (latLng) {
       const { lat, lng } = { ...latLng };
       setTimeout(() => {
@@ -33,7 +61,6 @@ const PlacesMap = () => {
   return (
     <Page title="Find">
       <Container maxWidth="lg">
-        <h6>Map View</h6>
         <NearbyPlacesMap places={places} />
       </Container>
     </Page>
