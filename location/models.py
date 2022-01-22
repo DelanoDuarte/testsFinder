@@ -34,7 +34,6 @@ class Geolocation:
         if not location:
             return None
 
-        print(location)
         address: List
         address = location.address.split(",")
         return Geolocation(

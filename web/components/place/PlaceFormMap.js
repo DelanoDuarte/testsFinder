@@ -28,7 +28,7 @@ const CurrentLocationMarker = ({}) => {
     load() {
       if (latLng && latLng.lat && latLng.lng) {
         setPosition(latLng);
-        map.flyTo(latLng, 12);
+        map.flyTo(latLng, 15);
       }
     },
     click() {
@@ -37,7 +37,7 @@ const CurrentLocationMarker = ({}) => {
     locationfound(e) {
       setPosition(e.latlng);
       dispatch(setCurrentLocation(e.latlng));
-      map.flyTo(e.latlng, 12);
+      map.flyTo(e.latlng, 16);
     },
     dragend() {
       const marker = markerRef.current;

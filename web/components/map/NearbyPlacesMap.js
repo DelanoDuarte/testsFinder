@@ -9,7 +9,7 @@ import {
   Popup,
   TileLayer,
   Tooltip,
-  useMapEvents
+  useMapEvents,
 } from "react-leaflet";
 import { useDispatch } from "react-redux";
 import { setCurrentLocation } from "../../reducers/locationSlicer";
@@ -17,7 +17,7 @@ import { placeMarker, positionMarker } from "./AppIconMarker";
 
 const position = [51.505, -0.09];
 
-const MyLocationMarker = ({}) => {
+const MyLocationMarker = ({ onLocationFound }) => {
   const [position, setPosition] = useState(null);
   const dispatch = useDispatch();
 
@@ -28,6 +28,7 @@ const MyLocationMarker = ({}) => {
     locationfound(e) {
       setPosition(e.latlng);
       dispatch(setCurrentLocation(e.latlng));
+      onLocationFound(e.latlng);
       map.flyTo(e.latlng, 16);
     },
   });
@@ -58,7 +59,7 @@ const PlaceMarker = ({ place }) => {
   );
 };
 
-const NearbyPlacesMap = ({ places }) => {
+const NearbyPlacesMap = ({ places, onLocationFound }) => {
   return (
     <MapContainer
       center={position}
@@ -74,7 +75,7 @@ const NearbyPlacesMap = ({ places }) => {
         <PlaceMarker key={place.id} place={place} />
       ))}
 
-      <MyLocationMarker />
+      <MyLocationMarker onLocationFound={onLocationFound} />
     </MapContainer>
   );
 };

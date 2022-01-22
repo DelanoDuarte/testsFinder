@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     # "django.contrib.gis",
     "rest_framework",
     "corsheaders",
+    "channels",
     "place.apps.PlaceConfig",
     "location.apps.LocationConfig",
 ]
@@ -80,6 +81,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "main.wsgi.application"
+ASGI_APPLICATION = "main.asgi.application"
 
 
 # Database
@@ -149,3 +151,13 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 #     os.environ['GDAL_DATA'] = OSGEO4W + r"\share\gdal"
 #     os.environ['PROJ_LIB'] = OSGEO4W + r"\share\proj"
 #     os.environ['PATH'] = OSGEO4W + r"\bin;" + os.environ['PATH']
+
+
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [("localhost", 6379)],
+#         },
+#     },
+# }

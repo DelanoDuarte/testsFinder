@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Place, PlaceAddress
 
+
 class PlaceAddressListSerializer(serializers.ModelSerializer):
     class Meta:
         model = PlaceAddress
@@ -13,9 +14,10 @@ class PlaceAddressListSerializer(serializers.ModelSerializer):
             "city",
             "country",
             "latitude",
-            "longitude"
+            "longitude",
         )
-        
+
+
 class PlaceAddressSerializer(serializers.ModelSerializer):
 
     address = serializers.CharField(max_length=2048, required=True)
@@ -25,25 +27,22 @@ class PlaceAddressSerializer(serializers.ModelSerializer):
     city = serializers.CharField(max_length=128, required=True)
     country = serializers.CharField(max_length=128, required=True)
 
-    lat = serializers.DecimalField(max_digits=50, decimal_places=30, required=True, source='latitude')
-    lng = serializers.DecimalField(max_digits=50, decimal_places=30, required=True, source='longitude')
+    lat = serializers.DecimalField(
+        max_digits=50, decimal_places=30, required=True, source="latitude"
+    )
+    lng = serializers.DecimalField(
+        max_digits=50, decimal_places=30, required=True, source="longitude"
+    )
 
     class Meta:
         model = PlaceAddress
-        fields = (
-            "address",
-            "district",
-            "zone",
-            "zip",
-            "city",
-            "country",
-            "lat",
-            "lng"
-        )
+        fields = ("address", "district", "zone", "zip", "city", "country", "lat", "lng")
+
 
 class PlaceAddressGeolocationSerializer(serializers.Serializer):
     latitude = serializers.CharField(required=True)
     longitude = serializers.CharField(required=True)
+
 
 class PlaceListSerializer(serializers.ModelSerializer):
 
@@ -51,7 +50,18 @@ class PlaceListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Place
-        fields = ("id", "name", "description", "phone", "email", "website", "address", "amount_tests", "last_update")
+        fields = (
+            "id",
+            "name",
+            "description",
+            "phone",
+            "email",
+            "website",
+            "address",
+            "amount_tests",
+            "last_update",
+        )
+
 
 class CreatePlaceSerializer(serializers.ModelSerializer):
 
@@ -63,7 +73,16 @@ class CreatePlaceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Place
-        fields = ("id", "name", "description", "phone", "email", "website", "address", "amount_tests")
+        fields = (
+            "id",
+            "name",
+            "description",
+            "phone",
+            "email",
+            "website",
+            "address",
+            "amount_tests",
+        )
 
     def create(self, validated_data):
         address_data = validated_data.pop("address")
@@ -71,3 +90,14 @@ class CreatePlaceSerializer(serializers.ModelSerializer):
             address = PlaceAddress.objects.create(**address_data)
             return Place.objects.create(address=address, **validated_data)
         return Place.objects.create(**validated_data)
+
+
+class DecrementTestSerializer(serializers.ModelSerializer):
+
+    id = serializers.ReadOnlyField()
+    name = serializers.ReadOnlyField()
+    amount = serializers.IntegerField(required=True, min_value=1, source="amount_tests")
+
+    class Meta:
+        model = Place
+        fields = ("id", "name", "amount")

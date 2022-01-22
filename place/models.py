@@ -2,6 +2,7 @@ from django.db import models
 
 # Create your models here.
 
+
 class PlaceAddress(models.Model):
 
     address = models.CharField(max_length=2048, null=False)
@@ -10,10 +11,11 @@ class PlaceAddress(models.Model):
     zip = models.CharField(max_length=64, null=False)
     city = models.CharField(max_length=128, null=False)
     country = models.CharField(max_length=128, null=False)
-    
+
     # GeoLocation
     latitude = models.DecimalField(max_digits=50, decimal_places=20)
     longitude = models.DecimalField(max_digits=50, decimal_places=20)
+
 
 class Place(models.Model):
 
@@ -46,7 +48,23 @@ class Place(models.Model):
             float(longitude),
             float(latitude),
             radius,
-            limit
+            limit,
         )
 
         return cls.objects.raw(query)
+    
+    @classmethod
+    def decrement_tests(cls, placeId: int, amount: int):
+        place: Place
+        place = cls.objects.get(id=placeId)
+        place.amount_tests -= amount
+        place.save()
+        return place
+
+    @classmethod
+    def increment_tests(cls, placeId: int, amount: int):
+        place: Place
+        place = cls.objects.get(id=placeId)
+        place.amount_tests += amount
+        place.save()
+        return place

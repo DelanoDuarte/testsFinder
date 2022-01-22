@@ -1,11 +1,11 @@
 import { Container } from "@mui/material";
 import dynamic from "next/dynamic";
+import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Page } from "../../../../components/shared";
 import PlaceAPI from "../../../../lib/api/PlaceAPI";
-
-import { useSnackbar } from "notistack";
+import { HOST_PORT } from "../../../../lib/constants";
 
 const NearbyPlacesMap = dynamic(
   () => import("../../../../components/map/NearbyPlacesMap"),
@@ -15,11 +15,24 @@ const NearbyPlacesMap = dynamic(
 );
 
 const PlacesMap = () => {
+  const webSocketClient = new WebSocket(
+    "ws://" + HOST_PORT + "/ws/places/nearby"
+  );
+
   const [places, setPlaces] = useState([]);
 
   const { enqueueSnackbar } = useSnackbar();
 
   const latLng = useSelector((state) => state.location.current);
+
+  const sendLocationFoundEvent = (latLng) => {
+    console.log(latLng);
+    if (latLng && latLng.lat && latLng.lng) {
+      webSocketClient.send(
+        JSON.stringify({ latitude: latLng.lat, longitude: latLng.lng })
+      );
+    }
+  };
 
   const checkNavigationPermission = () => {
     window.navigator.geolocation.getCurrentPosition(
@@ -44,24 +57,32 @@ const PlacesMap = () => {
   };
 
   useEffect(() => {
+    webSocketClient.onopen = () => {
+      console.log("WS Connection Open");
+    };
+
+    webSocketClient.onerror = (error) => {
+      console.log("WS Error: ", error);
+    };
+  }, []);
+
+  useEffect(() => {
     checkNavigationPermission();
 
-    if (latLng) {
-      const { lat, lng } = { ...latLng };
-      setTimeout(() => {
-        PlaceAPI.nearby(lat, lng)
-          .then((res) => {
-            setPlaces(res.data);
-          })
-          .catch((error) => console.log(error));
-      }, 2000);
-    }
+    webSocketClient.onmessage = (e) => {
+      console.log("Message Received !");
+      const places = JSON.parse(e.data)
+      setPlaces(places);
+    };
   }, [latLng]);
 
   return (
     <Page title="Find">
       <Container maxWidth="lg">
-        <NearbyPlacesMap places={places} />
+        <NearbyPlacesMap
+          places={places}
+          onLocationFound={(latLng) => sendLocationFoundEvent(latLng)}
+        />
       </Container>
     </Page>
   );

@@ -42,6 +42,8 @@ class PlaceTest(TestCase):
             ),
         )
 
+    ##################################### integration tests
+
     def test_list_all_places(self):
         response = client.get("/place/")
         self.assertEqual(response.status_code, 200)
@@ -58,5 +60,32 @@ class PlaceTest(TestCase):
         )
         self.assertTrue(response.status_code, 200)
 
-    def test_create_place_with_address(self):
-        pass
+    ##################################### unit tests
+
+    def test_given_place_id_and_amount_when_decrement_then_update_place(self):
+
+        amount_to_decrement = 5
+
+        place: Place
+        place = Place.objects.all().first()
+        current_amount = place.amount_tests
+
+        place_new_amount: Place
+        place_new_amount = place.decrement_tests(place.id, amount_to_decrement)
+        new_amount = place_new_amount.amount_tests
+
+        self.assertEqual(new_amount, current_amount - amount_to_decrement)
+
+    def test_given_place_id_and_amount_when_increment_then_update_place(self):
+
+        amount_to_increment = 10
+
+        place: Place
+        place = Place.objects.all().first()
+        current_amount = place.amount_tests
+
+        place_new_amount: Place
+        place_new_amount = place.increment_tests(place.id, amount_to_increment)
+        new_amount = place_new_amount.amount_tests
+
+        self.assertEqual(new_amount, current_amount + amount_to_increment)
