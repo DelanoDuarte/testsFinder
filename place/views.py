@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework.generics import ListAPIView
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.parsers import JSONParser
@@ -7,10 +6,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from place.serializers import (CreatePlaceSerializer, DecrementTestSerializer,
-                               PlaceAddressGeolocationSerializer,
-                               PlaceAddressListSerializer, PlaceListSerializer)
+                               PlaceAddressGeolocationSerializer, PlaceListSerializer)
+from place.service import PlaceService
 
-from .models import Place, PlaceAddress
+from .models import Place
 
 
 # Create your views here.
@@ -50,7 +49,8 @@ class DecrementTestFromPlace(APIView):
     def post(self, request: Request, id: int):
         serializer = DecrementTestSerializer(data=request.data)
         if serializer.is_valid():
-            place = Place.decrement_tests(id, **serializer.data)
+            service = PlaceService()
+            place = service.decrement_test(id, **serializer.data)
             pSerializer = DecrementTestSerializer(place, many=False)
             return Response(pSerializer.data)
         return Response(serializer.errors, status=400)

@@ -11,6 +11,7 @@ import os
 
 import django
 from channels.auth import AuthMiddlewareStack
+from channels.sessions import SessionMiddlewareStack
 from channels.http import AsgiHandler
 from channels.routing import ProtocolTypeRouter, URLRouter
 from django.core.asgi import get_asgi_application
@@ -22,7 +23,7 @@ django.setup()
 application = ProtocolTypeRouter({
     "http": AsgiHandler(),
     # Just HTTP for now. (We can add other protocols later.)
-    "websocket": AuthMiddlewareStack(
+    "websocket": SessionMiddlewareStack(
         URLRouter(
             place.routing.websocket_urlpatterns
         )
