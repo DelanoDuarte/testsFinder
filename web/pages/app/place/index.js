@@ -1,6 +1,6 @@
 import { Box, Container, Grid, Pagination } from "@mui/material";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { PlaceCard } from "../../../components/place";
 import PlaceListToolbar from "../../../components/place/PlaceListToolbar";
 import { Page } from "../../../components/shared";
@@ -10,7 +10,6 @@ const PlaceIndex = (props) => {
   const router = useRouter();
 
   const [places, setPlaces] = useState([]);
-  const [totalRecords, setTotalRecords] = useState(0);
   const [itemsPerPage, setTotalItemsPerPage] = useState(10);
 
   const onPageChange = (event, value) => {
@@ -24,12 +23,8 @@ const PlaceIndex = (props) => {
   const searchPlaces = (limit, offset) => {
     PlaceAPI.page(limit, offset).then((res) => {
       setPlaces(res.data.results);
-      setTotalRecords(res.data.count);
     });
   };
-  useEffect(() => {
-    searchPlaces(itemsPerPage, 0);
-  }, []);
 
   return (
     <Page title="Places">
@@ -38,7 +33,7 @@ const PlaceIndex = (props) => {
 
         <Box sx={{ pt: 3 }}>
           <Grid container spacing={3}>
-            {places.map((place) => (
+            {props.places.map((place) => (
               <Grid item key={place.id} lg={4} md={6} xs={12}>
                 <PlaceCard place={place} />
               </Grid>
@@ -53,7 +48,7 @@ const PlaceIndex = (props) => {
           }}
         >
           <Pagination
-            count={Math.ceil(totalRecords / itemsPerPage)}
+            count={Math.ceil(props.totalRecords / itemsPerPage)}
             color="primary"
             size="small"
             onChange={onPageChange}
@@ -63,5 +58,19 @@ const PlaceIndex = (props) => {
     </Page>
   );
 };
+
+export async function getServerSideProps(context) {
+  const res = await PlaceAPI.page(10, 0);
+  const places = await res.data.results;
+
+  const totalRecords = await res.data.count;
+
+  return {
+    props: {
+      places,
+      totalRecords,
+    }, // will be passed to the page component as props
+  };
+}
 
 export default PlaceIndex;
